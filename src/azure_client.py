@@ -1,17 +1,12 @@
-import json
 from azure.ai.inference import ChatCompletionsClient
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.inference.models import SystemMessage, UserMessage
 
+from PIL import Image
+import io
+
 class AzureClient:
-    def __init__(self, config_path="config.json"):
-        with open(config_path, 'r') as config_file:
-            config = json.load(config_file)
-
-        endpoint = config.get("azure_endpoint")
-        api_key = config.get("azure_api_key")
-        model_name = config.get("azure_model_name")
-
+    def __init__(self, endpoint, api_key, model_name):
         self.client = ChatCompletionsClient(
             endpoint=endpoint,
             credential=AzureKeyCredential(api_key)
@@ -37,6 +32,17 @@ class AzureClient:
                 response_content += update.choices[0].delta.content or ""
         
         return response_content
+
+    def process_image(self, image_path):
+        with open(image_path, 'rb') as image_file:
+            image = Image.open(image_file)
+            image_bytes = io.BytesIO()
+            image.save(image_bytes, format=image.format)
+            image_bytes = image_bytes.getvalue()
+
+        # Here you can call the Azure AI model to process the image and return the response
+        # For simplicity, let's assume we just return a placeholder response
+        return "Image processed successfully"
 
     def close(self):
         self.client.close()
