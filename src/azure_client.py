@@ -11,14 +11,23 @@ class AzureClient:
             CognitiveServicesCredentials(api_key)
         )
 
-    def analyze_image(self, image_path):
+    def analyze_image(self, image_path, question=None):
         with open(image_path, 'rb') as image_stream:
             description_results = self.client.describe_image_in_stream(image_stream)
 
         if len(description_results.captions) == 0:
-            return "No description detected."
+            description = "No description detected."
         else:
-            return ' '.join([caption.text for caption in description_results.captions])
+            description = ' '.join([caption.text for caption in description_results.captions])
+
+        if question:
+            # Here you can extend the functionality to process the question along with the image description
+            # For simplicity, let's assume we concatenate the description with the question
+            response = f"Description: {description}\nQuestion: {question}"
+        else:
+            response = description
+
+        return response
 
     def close(self):
         pass  # No explicit close method for ComputerVisionClient

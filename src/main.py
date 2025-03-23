@@ -1,4 +1,5 @@
-from tkinter import Tk, Label, Entry, Button, Text, Scrollbar, END, filedialog
+from tkinter import Tk, Label, Entry, Button, Text, Scrollbar, END, filedialog, Canvas
+from PIL import Image, ImageTk
 from azure_client import AzureClient
 
 class Application:
@@ -25,20 +26,34 @@ class Application:
         self.scrollbar.pack(side='right', fill='y')
         self.response_text['yscrollcommand'] = self.scrollbar.set
 
+        self.canvas = Canvas(master, width=500, height=500)
+        self.canvas.pack()
+
         endpoint = "https://f5aivision.cognitiveservices.azure.com/"
         api_key = "FByM1jjbJD28ykMClaxV4Y03zfKU7YSPZzII4ooo7sHmBWnJQlbOJQQJ99BCACYeBjFXJ3w3AAAFACOG4qcU"
         self.azure_client = AzureClient(endpoint, api_key)
 
+        self.image_path = None
+
     def get_response(self):
         user_input = self.entry.get()
         self.entry.delete(0, END)
-        response = self.azure_client.get_response(user_input)
+        if self.image_path:
+            response = self.azure_client.analyze_image(self.image_path, user_input)
+        else:
+            response = self.azure_client.get_response(user_input)
         self.response_text.insert(END, response + "\n")
 
     def upload_image(self):
-        image_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
-        if image_path:
-            response = self.azure_client.analyze_image(image_path)
+        self.image_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
+        if self.image_path:
+            img = Image.open(self.image_path)
+            img.thumbnail((500, 500))
+            img = ImageTk.PhotoImage(img)
+            self.canvas.create_image(0, 0, anchor='nw', image=img)
+            self.canvas.image = img  # Keep a reference to avoid garbage collection
+
+            response = self.azure_client.analyze_image(self.image_path)
             self.response_text.insert(END, response + "\n")
 
 if __name__ == "__main__":
