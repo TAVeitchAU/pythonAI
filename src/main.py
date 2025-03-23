@@ -1,8 +1,6 @@
 from tkinter import Tk, Label, Entry, Button, Text, Scrollbar, END
 from azure_client import AzureClient
-endpoint = "https://ai-tomveitch3489ai260312779439.openai.azure.com/openai/deployments/gpt-4o"
-api_key = "1syRx28AXs1jDIi1gsIVfRPxvTBwORU6E0qkfGg3hGq7m5bs3k6wJQQJ99AKACYeBjFXJ3w3AAAAACOGkvdp"
-model_name = "gpt-4o"
+
 class Application:
     def __init__(self, master):
         self.master = master

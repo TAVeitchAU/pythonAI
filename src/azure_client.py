@@ -3,7 +3,6 @@ from azure.core.credentials import AzureKeyCredential
 from azure.ai.inference.models import SystemMessage, UserMessage
 
 class AzureClient:
-
     def __init__(self, endpoint, api_key, model_name):
         self.client = ChatCompletionsClient(
             endpoint=endpoint,
