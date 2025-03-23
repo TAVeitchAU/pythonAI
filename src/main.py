@@ -25,10 +25,9 @@ class Application:
         self.scrollbar.pack(side='right', fill='y')
         self.response_text['yscrollcommand'] = self.scrollbar.set
 
-        endpoint = "https://ai-tomveitch3489ai260312779439.openai.azure.com/openai/deployments/gpt-4o"
-        api_key = "1syRx28AXs1jDIi1gsIVfRPxvTBwORU6E0qkfGg3hGq7m5bs3k6wJQQJ99AKACYeBjFXJ3w3AAAAACOGkvdp"
-        model_name = "gpt-4o"
-        self.azure_client = AzureClient(endpoint, api_key, model_name)
+        endpoint = "https://f5aivision.cognitiveservices.azure.com/"
+        api_key = "FByM1jjbJD28ykMClaxV4Y03zfKU7YSPZzII4ooo7sHmBWnJQlbOJQQJ99BCACYeBjFXJ3w3AAAFACOG4qcU"
+        self.azure_client = AzureClient(endpoint, api_key)
 
     def get_response(self):
         user_input = self.entry.get()
@@ -39,7 +38,7 @@ class Application:
     def upload_image(self):
         image_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
         if image_path:
-            response = self.azure_client.process_image(image_path)
+            response = self.azure_client.analyze_image(image_path)
             self.response_text.insert(END, response + "\n")
 
 if __name__ == "__main__":

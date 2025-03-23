@@ -1,48 +1,24 @@
-from azure.ai.inference import ChatCompletionsClient
-from azure.core.credentials import AzureKeyCredential
-from azure.ai.inference.models import SystemMessage, UserMessage
-
+from azure.cognitiveservices.vision.computervision import ComputerVisionClient
+from msrest.authentication import CognitiveServicesCredentials
 from PIL import Image
 import io
+import os
 
 class AzureClient:
-    def __init__(self, endpoint, api_key, model_name):
-        self.client = ChatCompletionsClient(
-            endpoint=endpoint,
-            credential=AzureKeyCredential(api_key)
-        )
-        self.model_name = model_name  
-
-    def get_response(self, user_message):
-        response = self.client.complete(
-            stream=True,
-            messages=[
-                SystemMessage(content="You are a helpful assistant."),
-                UserMessage(content=user_message)
-            ],
-            max_tokens=4096,
-            temperature=1.0,
-            top_p=1.0,
-            model=self.model_name
+    def __init__(self, endpoint, api_key, model_name=None):
+        self.client = ComputerVisionClient(
+            endpoint,
+            CognitiveServicesCredentials(api_key)
         )
 
-        response_content = ""
-        for update in response:
-            if update.choices:
-                response_content += update.choices[0].delta.content or ""
-        
-        return response_content
+    def analyze_image(self, image_path):
+        with open(image_path, 'rb') as image_stream:
+            description_results = self.client.describe_image_in_stream(image_stream)
 
-    def process_image(self, image_path):
-        with open(image_path, 'rb') as image_file:
-            image = Image.open(image_file)
-            image_bytes = io.BytesIO()
-            image.save(image_bytes, format=image.format)
-            image_bytes = image_bytes.getvalue()
-
-        # Here you can call the Azure AI model to process the image and return the response
-        # For simplicity, let's assume we just return a placeholder response
-        return "Image processed successfully"
+        if len(description_results.captions) == 0:
+            return "No description detected."
+        else:
+            return ' '.join([caption.text for caption in description_results.captions])
 
     def close(self):
-        self.client.close()
+        pass  # No explicit close method for ComputerVisionClient
