@@ -1,9 +1,17 @@
+import json
 from azure.ai.inference import ChatCompletionsClient
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.inference.models import SystemMessage, UserMessage
 
 class AzureClient:
-    def __init__(self, endpoint, api_key, model_name):
+    def __init__(self, config_path="config.json"):
+        with open(config_path, 'r') as config_file:
+            config = json.load(config_file)
+
+        endpoint = config.get("azure_endpoint")
+        api_key = config.get("azure_api_key")
+        model_name = config.get("azure_model_name")
+
         self.client = ChatCompletionsClient(
             endpoint=endpoint,
             credential=AzureKeyCredential(api_key)
